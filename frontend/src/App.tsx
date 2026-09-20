@@ -1,65 +1,1063 @@
 import { useMemo, useState } from 'react'
-import { Activity, ArrowRight, BarChart3, Bell, Bus, CalendarDays, Camera, Check, ChevronDown, Compass, Heart, Hotel, Languages, Leaf, LocateFixed, MapPin, Menu, MessageCircle, Mic, Mountain, Navigation, Plane, Search, Send, ShieldCheck, SlidersHorizontal, Sparkles, Star, TreePalm, UserRound, WalletCards, X, Zap } from 'lucide-react'
+import {
+  Activity,
+  ArrowRight,
+  BarChart3,
+  Bell,
+  Bus,
+  CalendarDays,
+  Camera,
+  Check,
+  ChevronDown,
+  Compass,
+  Heart,
+  Hotel,
+  Languages,
+  Leaf,
+  LocateFixed,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Mic,
+  Mountain,
+  Navigation,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  SunMedium,
+  User,
+  Utensils,
+  X,
+} from 'lucide-react'
 
-type Page = 'home' | 'explore' | 'details' | 'planner' | 'guide' | 'translator' | 'booking' | 'trip' | 'profile' | 'safety'
-type Destination = { name:string; location:string; category:string; rating:number; price:string; image:string; description:string }
+import DestinationDetails from './components/DestinationDetails'
 
-const destinations: Destination[] = [
- { name:'Sajek Valley', location:'Rangamati, Chattogram', category:'Hills', rating:4.9, price:'৳8,500', image:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=85', description:'Wake up above the clouds among rolling green hills and warm tribal hospitality.' },
- { name:"Cox's Bazar", location:'Chattogram Division', category:'Beaches', rating:4.8, price:'৳12,000', image:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=85', description:'Miles of golden sand, sea breeze and the longest natural beach in the world.' },
- { name:'Sundarbans', location:'Khulna Division', category:'Nature', rating:4.7, price:'৳14,500', image:'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=900&q=85', description:'A wild mangrove expedition through Bengal tiger country and quiet waterways.' },
- { name:'Srimangal', location:'Moulvibazar, Sylhet', category:'Nature', rating:4.8, price:'৳7,200', image:'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=900&q=85', description:'Lush tea gardens, forest trails and the slow, fragrant rhythm of Sylhet.' },
- { name:'Rangamati', location:'Chattogram Hill Tracts', category:'Hills', rating:4.6, price:'৳9,000', image:'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=900&q=85', description:'Lake adventures and emerald hills in the heart of the Chattogram Hill Tracts.' },
- { name:'Paharpur', location:'Naogaon, Rajshahi', category:'Heritage', rating:4.7, price:'৳5,500', image:'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=900&q=85', description:'Walk through the ancient ruins of one of South Asia’s greatest Buddhist monasteries.' },
- { name:'Ratargul', location:'Sylhet Division', category:'Nature', rating:4.6, price:'৳6,800', image:'https://images.unsplash.com/photo-1473445361085-b9a07f55608b?auto=format&fit=crop&w=900&q=85', description:'Glide through Bangladesh’s only freshwater swamp forest.' },
-]
+export type Page = 'home' | 'explore' | 'details' | 'planner' | 'guide' | 'translator' | 'booking' | 'trip' | 'profile' | 'safety'
 
-const navItems:{label:string; page:Page; icon:any}[] = [{label:'Home',page:'home',icon:Compass},{label:'Explore',page:'explore',icon:MapPin},{label:'Bookings',page:'booking',icon:CalendarDays},{label:'AI Guide',page:'planner',icon:Sparkles}]
-
-function App(){
- const [page,setPage]=useState<Page>('home'); const [selected,setSelected]=useState(destinations[0]); const [menu,setMenu]=useState(false); const [toast,setToast]=useState(''); const [favorites,setFavorites]=useState<string[]>([])
- const notify=(m:string)=>{setToast(m);setTimeout(()=>setToast(''),2600)}
- const go=(p:Page,d?:Destination)=>{if(d)setSelected(d);setPage(p);setMenu(false);window.scrollTo({top:0,behavior:'smooth'})}
- const toggleFav=(name:string)=>setFavorites(f=>f.includes(name)?f.filter(x=>x!==name):[...f,name])
- return <div className="min-h-screen bg-[#fbfcf9] text-[#14352b]">
-  <header className="sticky top-0 z-40 border-b border-black/5 bg-[#fbfcf9]/95 backdrop-blur-xl"><div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 lg:px-8">
-   <button onClick={()=>go('home')} className="flex items-center gap-2.5"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0B3D2E] text-white shadow-lg shadow-[#0B3D2E]/20"><Leaf size={21}/></span><span className="text-xl font-extrabold tracking-tight text-[#0B3D2E]">desh<span className="text-[#CC4E31]">go</span><small className="ml-1.5 text-[10px] font-semibold uppercase tracking-[.18em] text-[#0077BE]">Bangladesh</small></span></button>
-   <nav className="hidden items-center gap-1 lg:flex">{navItems.map(n=><button key={n.label} onClick={()=>go(n.page)} className={`rounded-full px-4 py-2.5 text-sm font-semibold transition ${page===n.page?'bg-[#e5f1ea] text-[#0B3D2E]':'text-slate-600 hover:bg-slate-100'}`}>{n.label}</button>)}<button onClick={()=>go('safety')} className="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100">Safety</button></nav>
-   <div className="hidden items-center gap-3 lg:flex"><button onClick={()=>go('profile')} className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-semibold"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fce2d9] text-[#CC4E31]"><UserRound size={16}/></span> Hi, Raihan <ChevronDown size={14}/></button></div>
-   <button className="rounded-xl p-2 lg:hidden" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button>
-  </div>{menu&&<div className="border-t border-slate-100 bg-white px-5 py-4 lg:hidden">{[...navItems,{label:'Safety & SOS',page:'safety',icon:ShieldCheck},{label:'My Profile',page:'profile',icon:UserRound}].map(n=><button key={n.label} onClick={()=>go(n.page)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-semibold hover:bg-slate-50"><n.icon size={18}/>{n.label}</button>)}</div>}</header>
-  <main>{page==='home'&&<Home go={go} toggleFav={toggleFav} favorites={favorites}/>} {page==='explore'&&<Explore go={go} toggleFav={toggleFav} favorites={favorites}/>} {page==='details'&&<Details d={selected} go={go} notify={notify} toggleFav={toggleFav} favorites={favorites}/>} {page==='planner'&&<Planner go={go} notify={notify}/>} {page==='guide'&&<Guide notify={notify}/>} {page==='translator'&&<Translator/>} {page==='booking'&&<Booking notify={notify}/>} {page==='trip'&&<Trip go={go}/>} {page==='profile'&&<Profile favorites={favorites} go={go}/>} {page==='safety'&&<Safety notify={notify}/>}</main>
-  <footer className="mt-20 border-t border-slate-200 bg-[#0B3D2E] text-white"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-4 lg:px-8"><div className="md:col-span-2"><div className="flex items-center gap-2 text-2xl font-extrabold">🌿 desh<span className="text-[#f28b6d]">go</span></div><p className="mt-4 max-w-sm text-sm leading-7 text-white/65">Your thoughtful companion for discovering the real Bangladesh — from quiet tea gardens to the edge of the sea.</p></div><div><h4 className="font-bold">Discover</h4><button onClick={()=>go('explore')} className="mt-4 block text-sm text-white/65 hover:text-white">Explore destinations</button><button onClick={()=>go('planner')} className="mt-3 block text-sm text-white/65 hover:text-white">AI trip planner</button></div><div><h4 className="font-bold">Need help?</h4><button onClick={()=>go('safety')} className="mt-4 block text-sm text-white/65 hover:text-white">Safety & SOS</button><p className="mt-3 text-sm text-white/65">hello@deshgo.travel</p></div></div><div className="border-t border-white/10 py-5 text-center text-xs text-white/45">© 2024 deshgo · Made for curious travellers</div></footer>
-  <button onClick={()=>go('safety')} className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-full bg-[#CC4E31] px-4 py-3 text-sm font-bold text-white shadow-xl shadow-[#CC4E31]/30 transition hover:scale-105"><ShieldCheck size={17}/> SOS</button>{toast&&<div className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#14352b] px-5 py-3 text-sm font-semibold text-white shadow-2xl"><Check size={17} className="text-[#79d0a0]"/>{toast}</div>}
- </div>
+export type Destination = {
+  name: string
+  location: string
+  category: string
+  rating: number
+  price: string
+  image: string
+  description: string
+  gallery: string[]
+  highlights: string[]
+  bestTime: string
+  duration: string
+  difficulty: string
+  howToGo: string
+  tips: string[]
+  reviewCount: number
 }
 
-function Home({go,toggleFav,favorites}:{go:(p:Page,d?:Destination)=>void;toggleFav:(n:string)=>void;favorites:string[]}){return <>
- <section className="hero-pattern"><div className="mx-auto max-w-7xl px-5 py-20 md:py-28 lg:px-8"><div className="max-w-2xl text-white"><div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold backdrop-blur"><span className="h-2 w-2 rounded-full bg-[#f28b6d]"/> Your story starts here</div><h1 className="text-4xl font-extrabold leading-[1.12] tracking-tight md:text-6xl">Discover the <span className="text-[#f6b29d]">real</span><br/> Bangladesh.</h1><p className="mt-5 max-w-lg text-base leading-7 text-white/80 md:text-lg">One thoughtful app for places that stay with you. Explore, plan, book and travel with confidence.</p><div className="mt-9 flex max-w-xl items-center gap-2 rounded-2xl bg-white p-2 shadow-2xl"><Search className="ml-3 text-slate-400" size={20}/><input className="min-w-0 flex-1 px-1 py-3 text-sm text-slate-700 outline-none" placeholder="Where do you want to go?"/><button onClick={()=>go('explore')} className="rounded-xl bg-[#0B3D2E] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#14533f]">Explore</button></div><div className="mt-7 flex flex-wrap gap-5 text-xs font-semibold text-white/75"><span className="flex items-center gap-2"><ShieldCheck size={15}/> Verified local tips</span><span className="flex items-center gap-2"><Zap size={15}/> AI-powered planning</span></div></div></div></section>
- <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="mb-7 flex items-end justify-between"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#CC4E31]">Take your pick</p><h2 className="mt-2 text-2xl font-extrabold md:text-3xl">What are you in the mood for?</h2></div><button onClick={()=>go('explore')} className="hidden items-center gap-2 text-sm font-bold text-[#0077BE] sm:flex">View all <ArrowRight size={17}/></button></div><div className="grid grid-cols-2 gap-3 md:grid-cols-4">{[{n:'Beaches',i:'🌊',c:'bg-blue-50'},{n:'Hills',i:'⛰️',c:'bg-emerald-50'},{n:'Nature',i:'🌿',c:'bg-lime-50'},{n:'Heritage',i:'🏛️',c:'bg-orange-50'}].map(x=><button onClick={()=>go('explore')} key={x.n} className={`${x.c} group rounded-2xl p-5 text-left transition hover:-translate-y-1 hover:shadow-lg`}><span className="text-3xl">{x.i}</span><p className="mt-5 font-bold">{x.n}</p><p className="mt-1 text-xs text-slate-500">Explore wonders</p></button>)}</div></section>
- <section className="bg-[#f1f6f0] py-14"><div className="mx-auto max-w-7xl px-5 lg:px-8"><div className="mb-7 flex items-end justify-between"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#0077BE]">Handpicked for you</p><h2 className="mt-2 text-2xl font-extrabold md:text-3xl">Popular right now</h2></div><button onClick={()=>go('explore')} className="flex items-center gap-2 text-sm font-bold text-[#0077BE]">See all <ArrowRight size={17}/></button></div><div className="no-scrollbar flex gap-5 overflow-x-auto pb-3">{destinations.slice(0,4).map(d=><DestinationCard key={d.name} d={d} go={go} toggleFav={toggleFav} favorite={favorites.includes(d.name)}/>)}</div></div></section>
- <section className="mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="relative overflow-hidden rounded-[28px] bg-[#0B3D2E] p-7 text-white md:p-12"><div className="absolute right-0 top-0 h-full w-1/2 bg-[url('https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=900&q=80')] bg-cover opacity-25 md:opacity-50"/><div className="relative max-w-xl"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold"><Sparkles size={14} className="text-[#f6b29d]"/> Your personal AI travel companion</span><h2 className="mt-5 text-3xl font-extrabold md:text-4xl">A trip that feels like yours.</h2><p className="mt-4 leading-7 text-white/70">Tell us your pace, budget and curiosity. We’ll turn it into a beautiful Bangladesh story.</p><button onClick={()=>go('planner')} className="mt-7 flex items-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-[#0B3D2E]">Plan with AI <ArrowRight size={17}/></button></div></div></section>
- <section className="mx-auto grid max-w-7xl gap-4 px-5 pb-10 md:grid-cols-3 lg:px-8">{[{i:ShieldCheck,t:'Travel with confidence',d:'Safety contacts and smart local guidance when you need it.'},{i:Languages,t:'Speak like a local',d:'Translate Bengali phrases and connect beyond the tourist trail.'},{i:Heart,t:'Save your moments',d:'Keep destinations and your full journey together in one place.'}].map(x=><div className="rounded-2xl border border-slate-200 bg-white p-5" key={x.t}><x.i className="text-[#0077BE]" size={22}/><h3 className="mt-4 font-bold">{x.t}</h3><p className="mt-2 text-sm leading-6 text-slate-500">{x.d}</p></div>)}</section>
- </>}
+const destinations: Destination[] = [
+  {
+    name: 'Sajek Valley',
+    location: 'Rangamati, Chattogram',
+    category: 'Hills',
+    rating: 4.9,
+    price: '৳8,500',
+    image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Sajek is a cloud-kissed hill destination where bamboo houses, winding roads and endless valley views create a beautiful escape. It blends dramatic mountain scenery with warm local hospitality and vibrant tribal culture.',
+    gallery: [
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1501555088652-f886f2a6d5cf?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Cloudy sunrise viewpoints', 'Bamboo cottage stay', 'Tribal cultural experiences'],
+    bestTime: 'Oct - Mar',
+    duration: '2 - 3 days',
+    difficulty: 'Easy to moderate',
+    howToGo: 'Bus to Khagrachhari, then local jeep or rented car',
+    tips: ['Carry warm clothes for the evenings.', 'Book homestay early during holidays.', 'Try local hill chicken and bamboo rice.'],
+    reviewCount: 284,
+  },
+  {
+    name: "Cox's Bazar",
+    location: 'Chattogram Division',
+    category: 'Beaches',
+    rating: 4.8,
+    price: '৳12,000',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Bangladesh’s iconic sea beach stretches for miles with golden sand, turquoise water and a lively shoreline. It is ideal for both laid-back relaxation and family-friendly coastal adventures.',
+    gallery: [
+      'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Longest sea beach in the world', 'Sunset walks and seafood', 'Beachside resorts and cafés'],
+    bestTime: 'Nov - Feb',
+    duration: '2 - 4 days',
+    difficulty: 'Easy',
+    howToGo: 'Direct bus or flight to Chattogram, then road transfer',
+    tips: ['Avoid peak noon heat.', 'Keep valuables secure on crowded beaches.', 'Try fresh seafood near Laboni Point.'],
+    reviewCount: 562,
+  },
+  {
+    name: 'Sundarbans',
+    location: 'Khulna Division',
+    category: 'Nature',
+    rating: 4.7,
+    price: '৳14,500',
+    image: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'The Sundarbans is a UNESCO-listed mangrove forest that feels wild, mysterious and deeply connected to nature. It offers boat safaris, birdwatching and an unforgettable reminder of Bangladesh’s ecological richness.',
+    gallery: [
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Mangrove boat safari', 'Royal Bengal tiger sightings', 'Bird and crocodile spotting'],
+    bestTime: 'Nov - Feb',
+    duration: '2 - 3 days',
+    difficulty: 'Moderate',
+    howToGo: 'Drive to Khulna, then launch trip to the forest reserve',
+    tips: ['Book a guided safari.', 'Carry light rain gear.', 'Follow forest authority guidance closely.'],
+    reviewCount: 198,
+  },
+  {
+    name: 'Srimangal',
+    location: 'Moulvibazar, Sylhet',
+    category: 'Nature',
+    rating: 4.8,
+    price: '৳7,200',
+    image: 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Known as Bangladesh’s tea capital, Srimangal offers emerald tea gardens, misty hills and quiet nature trails. It is a favorite for slow travel, scenic walks and peaceful escapes.',
+    gallery: [
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Tea garden tours', 'Misty hill drives', 'Eco-resort stays'],
+    bestTime: 'Sep - Apr',
+    duration: '2 days',
+    difficulty: 'Easy',
+    howToGo: 'Train or bus to Sylhet, then local transport to Srimangal',
+    tips: ['Visit a tea estate in the morning.', 'Carry a light jacket for cool mornings.', 'Try fresh Sylheti snacks.'],
+    reviewCount: 231,
+  },
+  {
+    name: 'Rangamati',
+    location: 'Chattogram Hill Tracts',
+    category: 'Hills',
+    rating: 4.6,
+    price: '৳9,000',
+    image: 'https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Rangamati captures the natural beauty and cultural diversity of the hill tracts, with mountains, lakes and indigenous traditions all in one place. It is ideal for scenic drives and relaxed getaways.',
+    gallery: [
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Lake views and boat rides', 'Tribal markets and crafts', 'Mountain panoramas'],
+    bestTime: 'Oct - Mar',
+    duration: '2 - 3 days',
+    difficulty: 'Easy to moderate',
+    howToGo: 'Bus to Chattogram, then direct road transfer to Rangamati',
+    tips: ['Visit Kaptai Lake for sunset.', 'Ask your host about local handicrafts.', 'Keep cash handy for remote areas.'],
+    reviewCount: 187,
+  },
+  {
+    name: 'Paharpur',
+    location: 'Naogaon, Rajshahi',
+    category: 'Heritage',
+    rating: 4.7,
+    price: '৳5,500',
+    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Paharpur is one of the most important Buddhist archaeological sites in South Asia. The ancient ruins and calm surroundings make it a fascinating educational destination for history lovers.',
+    gallery: [
+      'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['UNESCO heritage site', 'Ancient monastic ruins', 'Rich archaeology and history'],
+    bestTime: 'Nov - Feb',
+    duration: '1 day',
+    difficulty: 'Easy',
+    howToGo: 'Train or bus to Rajshahi, then short road transfer',
+    tips: ['Go early to avoid heat.', 'Bring a hat and water.', 'Combine with local historical sites nearby.'],
+    reviewCount: 164,
+  },
+  {
+    name: 'Ratargul',
+    location: 'Sylhet Division',
+    category: 'Nature',
+    rating: 4.6,
+    price: '৳6,800',
+    image: 'https://images.unsplash.com/photo-1473445361085-b9a07f55608b?auto=format&fit=crop&w=1200&q=80',
+    description:
+      'Ratargul is a freshwater swamp forest full of floating greenery, still waters and unforgettable boat routes. It is a peaceful and unique wetland experience rarely found in Bangladesh.',
+    gallery: [
+      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1482192505345-5655af888cc4?auto=format&fit=crop&w=900&q=80',
+    ],
+    highlights: ['Swamp forest boat ride', 'Floating marsh ecosystem', 'Peaceful rural feel'],
+    bestTime: 'Jun - Oct',
+    duration: '1 day',
+    difficulty: 'Easy',
+    howToGo: 'Road trip to Sylhet, then local transfer to the swamp area',
+    tips: ['Carry waterproof footwear.', 'Visit during monsoon for the fullest view.', 'Hire local boatmen for the best route.'],
+    reviewCount: 149,
+  },
+]
 
-function DestinationCard({d,go,toggleFav,favorite}:{d:Destination;go:(p:Page,d?:Destination)=>void;toggleFav:(n:string)=>void;favorite:boolean}){return <article className="min-w-[270px] overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5 sm:min-w-[290px]"><div className="relative h-48"><img src={d.image} className="h-full w-full object-cover"/><button onClick={()=>toggleFav(d.name)} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-[#CC4E31] shadow-sm"> <Heart size={17} fill={favorite?'currentColor':'none'}/></button><span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold">{d.category}</span></div><button onClick={()=>go('details',d)} className="w-full p-4 text-left"><div className="flex items-start justify-between"><div><h3 className="font-extrabold">{d.name}</h3><p className="mt-1 flex items-center gap-1 text-xs text-slate-500"><MapPin size={12}/>{d.location}</p></div><span className="flex items-center gap-1 text-xs font-bold"><Star size={13} fill="#f5a524" className="text-[#f5a524]"/>{d.rating}</span></div><p className="mt-3 text-sm font-bold text-[#0077BE]">From {d.price}</p></button></article>}
+const navItems: { label: string; page: Page; icon: any }[] = [
+  { label: 'Home', page: 'home', icon: Compass },
+  { label: 'Explore', page: 'explore', icon: MapPin },
+  { label: 'Bookings', page: 'booking', icon: CalendarDays },
+  { label: 'AI Guide', page: 'guide', icon: Sparkles },
+  { label: 'Safety', page: 'safety', icon: ShieldCheck },
+]
 
-function Explore({go,toggleFav,favorites}:{go:(p:Page,d?:Destination)=>void;toggleFav:(n:string)=>void;favorites:string[]}){const [q,setQ]=useState('');const [cat,setCat]=useState('All');const filtered=useMemo(()=>destinations.filter(d=>(cat==='All'||d.category===cat)&&d.name.toLowerCase().includes(q.toLowerCase())),[q,cat]);return <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#CC4E31]">The Bangladesh atlas</p><h1 className="mt-2 text-3xl font-extrabold md:text-4xl">Find your next feeling.</h1><p className="mt-2 text-slate-500">{filtered.length} places waiting to be discovered</p></div><button onClick={()=>go('planner')} className="flex items-center gap-2 self-start rounded-xl bg-[#0B3D2E] px-4 py-3 text-sm font-bold text-white"><Sparkles size={16}/> Ask AI to plan</button></div><div className="mt-8 flex flex-col gap-3 md:flex-row"><div className="flex flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3"><Search size={19} className="text-slate-400"/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search destinations..." className="w-full outline-none"/></div><button className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold"><SlidersHorizontal size={17}/> Filters</button></div><div className="no-scrollbar mt-5 flex gap-2 overflow-x-auto pb-2">{['All','Beaches','Hills','Nature','Heritage'].map(c=><button onClick={()=>setCat(c)} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ${cat===c?'bg-[#0B3D2E] text-white':'bg-white text-slate-600 ring-1 ring-slate-200'}`} key={c}>{c}</button>)}</div><div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{filtered.map(d=><DestinationCard key={d.name} d={d} go={go} toggleFav={toggleFav} favorite={favorites.includes(d.name)}/>)}</div></div>}
+const categories = [
+  { name: 'Beaches', icon: SunMedium },
+  { name: 'Hills', icon: Mountain },
+  { name: 'Nature', icon: Leaf },
+  { name: 'Heritage', icon: LandmarkIcon },
+]
 
-function Details({d,go,notify,toggleFav,favorites}:{d:Destination;go:(p:Page,d?:Destination)=>void;notify:(m:string)=>void;toggleFav:(n:string)=>void;favorites:string[]}){return <div><div className="relative h-[360px] md:h-[470px]"><img src={d.image} className="h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"/><div className="absolute bottom-8 left-0 right-0 mx-auto max-w-7xl px-5 text-white lg:px-8"><span className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold backdrop-blur">{d.category}</span><h1 className="mt-4 text-4xl font-extrabold md:text-6xl">{d.name}</h1><p className="mt-2 flex items-center gap-2 text-sm text-white/80"><MapPin size={16}/>{d.location} <span>·</span><Star size={15} fill="#ffd166" className="text-[#ffd166]"/>{d.rating} rating</p></div></div><div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 lg:grid-cols-[1fr_340px] lg:px-8"><div><p className="text-lg leading-8 text-slate-600">{d.description} Come for the views, stay for the stories, flavours and people that make this place unmistakably Bangladesh.</p><h2 className="mt-10 text-2xl font-extrabold">Things to do</h2><div className="mt-5 grid gap-3 sm:grid-cols-2">{['Sunrise viewpoint walk','Local food & village stories','Scenic photography','Meet local communities'].map((x,i)=><div className="flex items-center gap-3 rounded-xl bg-[#f1f6f0] p-4 text-sm font-semibold" key={x}><span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#0077BE]">{i+1}</span>{x}</div>)}</div><h2 className="mt-10 text-2xl font-extrabold">Plan your visit</h2><div className="mt-5 grid gap-3 md:grid-cols-3">{[['Best time','Oct — Mar'],['How to go','Bus + local ride'],['Travel tip','Carry cash & water']].map(x=><div className="rounded-xl border border-slate-200 p-4" key={x[0]}><p className="text-xs font-bold uppercase tracking-wide text-slate-400">{x[0]}</p><p className="mt-2 font-bold">{x[1]}</p></div>)}</div></div><aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/50"><div className="flex items-center justify-between"><div><p className="text-xs text-slate-500">A comfortable weekend from</p><p className="mt-1 text-2xl font-extrabold">{d.price}</p></div><button onClick={()=>toggleFav(d.name)} className="rounded-full bg-[#fff1ec] p-3 text-[#CC4E31]"><Heart fill={favorites.includes(d.name)?'currentColor':'none'} size={20}/></button></div><button onClick={()=>go('planner',d)} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B3D2E] py-3.5 text-sm font-bold text-white">Plan this trip <ArrowRight size={17}/></button><button onClick={()=>notify('Added to your trip shortlist')} className="mt-3 w-full rounded-xl border border-slate-200 py-3.5 text-sm font-bold">Save for later</button></aside></div></div>}
+function LandmarkIcon({ className }: { className?: string }) {
+  return <span className={className}>◫</span>
+}
 
-function Planner({go,notify}:{go:(p:Page,d?:Destination)=>void;notify:(m:string)=>void}){const [loading,setLoading]=useState(false);const [done,setDone]=useState(false);const generate=()=>{setLoading(true);setTimeout(()=>{setLoading(false);setDone(true)},1200)};return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-8"><div className="mx-auto max-w-2xl text-center"><span className="inline-flex items-center gap-2 rounded-full bg-[#e5f1ea] px-3 py-1.5 text-xs font-bold text-[#0B3D2E]"><Sparkles size={14}/> DESHGO AI</span><h1 className="mt-4 text-3xl font-extrabold md:text-5xl">Your trip, imagined.</h1><p className="mt-4 text-slate-500">Share a few details and we’ll shape a Bangladesh adventure around you.</p></div><div className="mt-10 grid gap-6 lg:grid-cols-[.8fr_1.2fr]"><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><label className="text-sm font-bold">Where do you want to go?</label><div className="mt-2 flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-3"><MapPin size={18} className="text-[#0077BE]"/><input defaultValue="Sajek Valley" className="w-full bg-transparent outline-none"/></div><div className="mt-5 grid grid-cols-2 gap-3"><label className="text-sm font-bold">Days<input defaultValue="3 days" className="mt-2 w-full rounded-xl bg-slate-50 px-3 py-3 font-normal outline-none"/></label><label className="text-sm font-bold">Budget<input defaultValue="৳10,000" className="mt-2 w-full rounded-xl bg-slate-50 px-3 py-3 font-normal outline-none"/></label></div><label className="mt-5 block text-sm font-bold">Travel style</label><div className="mt-2 flex flex-wrap gap-2">{['Slow & scenic','Adventure','Culture & food'].map((x,i)=><button className={`rounded-full px-3 py-2 text-xs font-semibold ${i===0?'bg-[#0B3D2E] text-white':'bg-slate-50 text-slate-600'}`} key={x}>{x}</button>)}</div><button onClick={generate} disabled={loading} className="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B3D2E] py-3.5 font-bold text-white disabled:opacity-70">{loading?<><Activity className="animate-spin" size={18}/> Thinking...</>:<><Sparkles size={18}/> Create my itinerary</>}</button></div><div className="rounded-2xl bg-[#f1f6f0] p-6 md:p-8">{!done?<div className="flex h-full min-h-[360px] flex-col items-center justify-center text-center"><div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-[#0B3D2E] shadow-sm"><Compass size={30}/></div><h3 className="mt-5 text-xl font-extrabold">Your itinerary will appear here</h3><p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">A balanced plan with local gems, realistic travel time and an estimate you can trust.</p></div>:<div><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-widest text-[#CC4E31]">AI itinerary</p><h2 className="mt-1 text-2xl font-extrabold">3 days in Sajek</h2></div><span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#0B3D2E]">৳9,800 est.</span></div><div className="mt-6 space-y-3">{[['Day 01','Arrive in Sajek · sunset at Konglak para'],['Day 02','Misty morning viewpoint · local village lunch'],['Day 03','Helipad sunrise · return via Khagrachari']].map(x=><div className="flex gap-4 rounded-xl bg-white p-4" key={x[0]}><span className="w-14 shrink-0 text-xs font-extrabold text-[#0077BE]">{x[0]}</span><p className="text-sm font-semibold">{x[1]}</p></div>)}</div><div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-500"><span className="flex items-center gap-1"><Bus size={14}/> AC bus + local jeep</span><span className="flex items-center gap-1"><Hotel size={14}/> Hillside cottage</span></div><button onClick={()=>go('booking')} className="mt-6 flex items-center gap-2 text-sm font-bold text-[#0B3D2E]">Book this plan <ArrowRight size={16}/></button></div>}</div></div></div>}
+function App() {
+  const [page, setPage] = useState<Page>('home')
+  const [selected, setSelected] = useState<Destination>(destinations[0])
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [toast, setToast] = useState('')
+  const [favorites, setFavorites] = useState<string[]>(['Sajek Valley'])
 
-function Guide({notify}:{notify:(m:string)=>void}){return <div className="mx-auto max-w-5xl px-5 py-10 lg:px-8"><div className="grid gap-8 md:grid-cols-2 md:items-center"><div><span className="inline-flex items-center gap-2 rounded-full bg-[#e5f1ea] px-3 py-1.5 text-xs font-bold text-[#0B3D2E]"><Camera size={14}/> VISUAL GUIDE</span><h1 className="mt-4 text-4xl font-extrabold">Point. Discover.<br/><span className="text-[#0077BE]">Understand.</span></h1><p className="mt-4 leading-7 text-slate-500">Curious about a monument, dish or plant? Let deshgo tell you the story behind it.</p><button onClick={()=>notify('Image picker opened — demo mode')} className="mt-7 flex items-center gap-2 rounded-xl bg-[#0B3D2E] px-5 py-3.5 text-sm font-bold text-white"><Camera size={18}/> Scan an image</button></div><div className="relative overflow-hidden rounded-[28px] bg-[#d8e7d8] p-3"><img src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=900&q=85" className="h-[340px] w-full rounded-2xl object-cover"/><div className="absolute bottom-8 left-8 right-8 rounded-2xl bg-white/95 p-4 shadow-xl backdrop-blur"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-[#CC4E31]">Historical site</p><h3 className="mt-1 text-xl font-extrabold">Somapura Mahavihara</h3><p className="mt-1 text-xs text-slate-500">Paharpur, Naogaon</p></div><button onClick={()=>notify('Playing audio guide')} className="rounded-full bg-[#0B3D2E] p-3 text-white"><Mic size={18}/></button></div><p className="mt-3 text-sm leading-6 text-slate-600">One of the most important archaeological sites in South Asia, this ancient Buddhist monastery dates back to the 8th century.</p><div className="mt-3 flex gap-2"><button onClick={()=>notify('Map opened')} className="flex items-center gap-1 rounded-lg bg-[#e5f1ea] px-3 py-2 text-xs font-bold text-[#0B3D2E]"><Navigation size={13}/> Show on map</button><button onClick={()=>notify('Saved to your collection')} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold">Save</button></div></div></div></div></div>}
+  const notify = (message: string) => {
+    setToast(message)
+    window.clearTimeout((window as any).__toastTimeout)
+    ;(window as any).__toastTimeout = setTimeout(() => setToast(''), 2600)
+  }
 
-function Translator(){const [text,setText]=useState('Where is the nearest tea garden?');return <div className="mx-auto max-w-4xl px-5 py-10 lg:px-8"><div className="text-center"><span className="inline-flex rounded-full bg-[#e5f1ea] px-3 py-1.5 text-xs font-bold text-[#0B3D2E]">LANGUAGE BRIDGE</span><h1 className="mt-4 text-4xl font-extrabold">Find your common words.</h1><p className="mt-3 text-slate-500">Simple Bengali phrases for richer travel moments.</p></div><div className="mt-10 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-center gap-4 border-b border-slate-100 pb-4 text-sm font-bold"><button className="rounded-full bg-[#0B3D2E] px-4 py-2 text-white">English</button><Languages size={18} className="text-[#0077BE]"/><button className="rounded-full px-4 py-2 text-slate-500">বাংলা</button></div><div className="grid gap-4 pt-5 md:grid-cols-2"><div className="rounded-xl bg-slate-50 p-4"><textarea value={text} onChange={e=>setText(e.target.value)} className="h-28 w-full resize-none bg-transparent text-lg outline-none"/><div className="flex justify-between"><span className="text-xs text-slate-400">{text.length}/500</span><button className="rounded-full bg-white p-2 text-[#0077BE] shadow-sm"><Mic size={17}/></button></div></div><div className="rounded-xl bg-[#e5f1ea] p-4"><p className="h-28 text-lg font-semibold text-[#0B3D2E]">নিকটতম চা বাগান কোথায়?</p><div className="flex justify-end"><button className="rounded-full bg-white p-2 text-[#0B3D2E] shadow-sm"><Send size={17}/></button></div></div></div></div><div className="mt-5 flex items-center gap-3 rounded-xl border border-[#f5dfd8] bg-[#fff8f5] p-4 text-sm"><MessageCircle size={19} className="text-[#CC4E31]"/><span><b>Tip:</b> “ধন্যবাদ” (Dhonnobad) means thank you.</span></div></div>}
+  const go = (target: Page, destination?: Destination) => {
+    if (destination) setSelected(destination)
+    setPage(target)
+    setMenuOpen(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
-function Booking({notify}:{notify:(m:string)=>void}){const [type,setType]=useState('Stay');return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-8"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#CC4E31]">Move easy</p><h1 className="mt-2 text-4xl font-extrabold">Book your next leg.</h1><p className="mt-3 text-slate-500">Comfortable stays and trusted transport, all in one place.</p></div><div className="mt-8 flex gap-2">{['Stay','Transport'].map(x=><button onClick={()=>setType(x)} className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold ${type===x?'bg-[#0B3D2E] text-white':'bg-white ring-1 ring-slate-200'}`} key={x}>{x==='Stay'?<Hotel size={16}/>:<Bus size={16}/>} {x}</button>)}</div><div className="mt-6 grid gap-5 lg:grid-cols-3"><div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-1"><h3 className="font-extrabold">Search {type.toLowerCase()}</h3>{['From / destination','Check-in · 24 Oct','Guests · 2 travellers'].map((x,i)=><div className="mt-4 flex items-center gap-3 rounded-xl bg-slate-50 p-3" key={x}>{i===0?<MapPin size={17}/>:i===1?<CalendarDays size={17}/>:<UserRound size={17}/>}<span className="text-sm text-slate-600">{x}</span></div>)}<button onClick={()=>notify('Showing best available options')} className="mt-5 w-full rounded-xl bg-[#0B3D2E] py-3.5 text-sm font-bold text-white">Search options</button></div><div className="space-y-3 lg:col-span-2">{(type==='Stay'?[['Paharika Eco Resort','Sajek Valley · 4.8','৳3,200 / night','https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=80'],['Sea Pearl Beach Resort','Cox’s Bazar · 4.7','৳5,800 / night','https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=500&q=80']]:[['Green Line Paribahan','Dhaka → Chattogram · AC','৳1,250 / seat','https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=500&q=80'],['Hanif Enterprise','Dhaka → Khagrachari · AC','৳950 / seat','https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=500&q=80']]).map(x=><div className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm" key={x[0]}><img src={x[3]} className="h-28 w-28 rounded-xl object-cover"/><div className="flex min-w-0 flex-1 items-center justify-between"><div><h3 className="font-extrabold">{x[0]}</h3><p className="mt-1 text-xs text-slate-500">{x[1]}</p><p className="mt-3 text-sm font-extrabold text-[#0077BE]">{x[2]}</p></div><button onClick={()=>notify('Selected — continue to confirm')} className="rounded-xl bg-[#e5f1ea] px-3 py-2 text-xs font-bold text-[#0B3D2E]">Select</button></div></div>)}</div></div></div>}
+  const toggleFavorite = (name: string) => {
+    setFavorites((current) =>
+      current.includes(name) ? current.filter((item) => item !== name) : [...current, name],
+    )
+    notify(`${name} saved to your favorites`)
+  }
 
-function Trip({go}:{go:(p:Page)=>void}){return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-8"><div className="flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#0077BE]">Your journey</p><h1 className="mt-2 text-4xl font-extrabold">My trip to Sajek.</h1><p className="mt-2 flex items-center gap-2 text-sm text-slate-500"><CalendarDays size={15}/> 24 — 26 October 2024</p></div><button onClick={()=>go('safety')} className="flex items-center gap-2 rounded-xl border border-[#f5dfd8] bg-[#fff8f5] px-4 py-3 text-sm font-bold text-[#CC4E31]"><ShieldCheck size={17}/> Safety centre</button></div><div className="mt-8 grid gap-5 lg:grid-cols-3"><div className="rounded-2xl bg-[#0B3D2E] p-6 text-white lg:col-span-2"><div className="flex items-center justify-between"><span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">UPCOMING</span><span className="text-sm text-white/60">2 nights · 3 days</span></div><h2 className="mt-8 text-3xl font-extrabold">Sajek Valley</h2><p className="mt-2 flex items-center gap-2 text-sm text-white/65"><MapPin size={15}/> Rangamati, Chattogram</p><div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-5 text-sm"><div><p className="text-white/50">Stay</p><b className="mt-1 block">Paharika Eco</b></div><div><p className="text-white/50">Transport</p><b className="mt-1 block">Green Line</b></div><div><p className="text-white/50">Budget</p><b className="mt-1 block">৳9,800</b></div></div></div><div className="rounded-2xl border border-slate-200 bg-white p-6"><div className="flex items-center gap-2 text-[#0077BE]"><WalletCards size={19}/><h3 className="font-extrabold">Trip checklist</h3></div><div className="mt-5 space-y-4">{['Bus ticket confirmed','Hotel confirmed','Pack light rain jacket','Download offline map'].map((x,i)=><div className="flex items-center gap-3 text-sm" key={x}><span className={`flex h-5 w-5 items-center justify-center rounded-full ${i<2?'bg-[#0B3D2E] text-white':'border border-slate-300'}`}>{i<2&&<Check size={13}/>}</span>{x}</div>)}</div></div></div><div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-extrabold">Your itinerary</h2><div className="mt-5 grid gap-4 md:grid-cols-3">{['Day 01 · Arrival','Day 02 · Explore','Day 03 · Return'].map((x,i)=><div className="rounded-xl bg-[#f1f6f0] p-4" key={x}><p className="text-xs font-bold text-[#0077BE]">{x}</p><p className="mt-3 text-sm font-semibold leading-6">{['Arrive · check in · sunset at Konglak','Viewpoint sunrise · village lunch · bonfire','Helipad sunrise · breakfast · journey home'][i]}</p></div>)}</div></div></div>}
+  const featured = useMemo(() => destinations.slice(0, 4), [])
 
-function Profile({favorites,go}:{favorites:string[];go:(p:Page,d?:Destination)=>void}){return <div className="mx-auto max-w-5xl px-5 py-10 lg:px-8"><div className="flex items-center gap-5 rounded-2xl bg-[#e5f1ea] p-6 md:p-8"><div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f6b29d] text-2xl font-extrabold text-[#CC4E31]">RA</div><div><p className="text-sm text-slate-500">Welcome back</p><h1 className="mt-1 text-3xl font-extrabold">Raihan Ahmed</h1><p className="mt-1 text-sm text-slate-500">Explorer since 2024 · Dhaka</p></div></div><div className="mt-8 grid gap-5 md:grid-cols-3"><div className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-3xl font-extrabold text-[#0077BE]">{favorites.length}</p><p className="mt-2 text-sm text-slate-500">Saved destinations</p></div><div className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-3xl font-extrabold text-[#CC4E31]">01</p><p className="mt-2 text-sm text-slate-500">Upcoming trip</p></div><div className="rounded-2xl border border-slate-200 bg-white p-5"><p className="text-3xl font-extrabold text-[#0B3D2E]">12</p><p className="mt-2 text-sm text-slate-500">Places explored</p></div></div><div className="mt-8"><div className="flex items-center justify-between"><h2 className="text-xl font-extrabold">Saved destinations</h2><button onClick={()=>go('explore')} className="text-sm font-bold text-[#0077BE]">Explore more</button></div>{favorites.length? <div className="no-scrollbar mt-5 flex gap-5 overflow-x-auto">{destinations.filter(d=>favorites.includes(d.name)).map(d=><DestinationCard d={d} go={go} toggleFav={()=>{}} favorite key={d.name}/>)}</div>:<div className="mt-4 rounded-2xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500">Your saved places will appear here.</div>}</div></div>}
+  return (
+    <div className="min-h-screen bg-[#f8fbf9] text-[#14352b]">
+      <header className="sticky top-0 z-40 border-b border-[#dfeae4] bg-[#f8fbf9]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-3 px-4 lg:px-8">
+          <button onClick={() => go('home')} className="flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#0B3D2E] text-lg font-black text-white shadow-lg shadow-[#0B3D2E]/20">B</div>
+            <div className="text-left">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-[#71897e]">Bangladesh</div>
+              <div className="text-lg font-extrabold text-[#10372d]">Travel</div>
+            </div>
+          </button>
 
-function Safety({notify}:{notify:(m:string)=>void}){const [confirm,setConfirm]=useState(false);const actions=[['999 Emergency Call','National emergency hotline',Activity],['Tourist Police','+880 1320-222222',ShieldCheck],['Share Location','Send your live location',LocateFixed],['Nearby Hospital','Find medical help',Activity],['Nearby Police Station','Find nearest station',ShieldCheck]];return <div className="mx-auto max-w-5xl px-5 py-10 lg:px-8"><div className="rounded-[28px] bg-[#fff1ec] p-7 md:p-12"><span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#CC4E31]"><ShieldCheck size={14}/> TRAVEL SAFE</span><h1 className="mt-5 text-4xl font-extrabold md:text-5xl">Help is always<br/><span className="text-[#CC4E31]">within reach.</span></h1><p className="mt-4 max-w-lg leading-7 text-slate-600">Save this page before you travel. For emergencies in Bangladesh, call 999.</p><button onClick={()=>setConfirm(true)} className="mt-7 flex items-center gap-2 rounded-xl bg-[#CC4E31] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#CC4E31]/20"><Activity size={18}/> Emergency assistance</button></div><div className="mt-8 grid gap-3 sm:grid-cols-2">{actions.map(([title,sub,I])=><button onClick={()=>notify(title==='999 Emergency Call'?'Please confirm before calling 999':`${title} opened`)} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 text-left transition hover:border-[#CC4E31]" key={title as string}><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fff1ec] text-[#CC4E31]"><I size={20}/></span><span><b className="block">{title as string}</b><small className="mt-1 block text-slate-500">{sub as string}</small></span><ArrowRight className="ml-auto text-slate-400" size={18}/></button>)}</div>{confirm&&<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-5"><div className="max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#fff1ec] text-[#CC4E31]"><Activity/></div><h3 className="mt-4 text-xl font-extrabold">Call emergency services?</h3><p className="mt-2 text-sm leading-6 text-slate-500">This will connect you to Bangladesh’s national emergency number 999.</p><div className="mt-6 flex gap-3"><button onClick={()=>setConfirm(false)} className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-bold">Cancel</button><button onClick={()=>{setConfirm(false);notify('Demo: emergency call initiated')}} className="flex-1 rounded-xl bg-[#CC4E31] py-3 text-sm font-bold text-white">Call 999</button></div></div></div>}</div>}
+          <nav className="hidden items-center gap-1 rounded-full bg-white/80 px-2 py-2 shadow-sm ring-1 ring-[#dfe7e1] lg:flex">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const active = page === item.page
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => go(item.page)}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition ${
+                    active ? 'bg-[#0B3D2E] text-white shadow-md shadow-[#0B3D2E]/15' : 'text-[#234b3f] hover:bg-[#eef5f1]'
+                  }`}
+                >
+                  <Icon size={15} />
+                  {item.label}
+                </button>
+              )
+            })}
+          </nav>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            <button onClick={() => go('profile')} className="flex items-center gap-2 rounded-full border border-[#dfe8e2] bg-white px-3 py-2 text-sm font-semibold text-[#12372d]">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eaf1ee] text-[#0B3D2E]">
+                <User size={14} />
+              </div>
+              Hi, Raihan
+            </button>
+            <button onClick={() => go('planner')} className="rounded-full bg-[#CC4E31] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#CC4E31]/20">
+              AI Planner
+            </button>
+          </div>
+
+          <button className="rounded-xl p-2 lg:hidden" onClick={() => setMenuOpen((value) => !value)}>
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="border-t border-[#e4eee7] bg-white px-4 py-4 lg:hidden">
+            <div className="space-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => go(item.page)}
+                    className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-semibold text-[#12372d] hover:bg-[#edf5f1]"
+                  >
+                    <Icon size={16} />
+                    {item.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </header>
+
+      <main>
+        {page === 'home' && (
+          <HomePage go={go} toggleFavorite={toggleFavorite} favorites={favorites} />
+        )}
+        {page === 'explore' && (
+          <ExplorePage go={go} toggleFavorite={toggleFavorite} favorites={favorites} />
+        )}
+        {page === 'details' && (
+          <DestinationDetails
+            destination={selected}
+            onBack={() => go('explore')}
+            onPlan={() => go('planner')}
+            onSave={() => toggleFavorite(selected.name)}
+          />
+        )}
+        {page === 'planner' && <PlannerPage notify={notify} />}
+        {page === 'guide' && <GuidePage notify={notify} />}
+        {page === 'translator' && <TranslatorPage />}
+        {page === 'booking' && <BookingPage notify={notify} />}
+        {page === 'trip' && <TripPage go={go} />}
+        {page === 'profile' && <ProfilePage favorites={favorites} go={go} />}
+        {page === 'safety' && <SafetyPage notify={notify} />}
+      </main>
+
+      <footer className="mt-20 border-t border-[#dfeae3] bg-[#0B3D2E] text-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-4 lg:px-8">
+          <div className="md:col-span-2">
+            <div className="mb-4 flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 font-black">B</div>
+              <div>
+                <div className="text-xs uppercase tracking-[0.18em] text-[#b7c9c2]">Bangladesh</div>
+                <div className="text-lg font-extrabold">Travel Super App</div>
+              </div>
+            </div>
+            <p className="max-w-md text-sm leading-7 text-[#dfeae6]">
+              Helping local and international travelers discover Bangladesh with confidence, smart planning, bookings and safety support.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-extrabold uppercase tracking-[0.18em] text-[#a1c7b8]">Explore</h4>
+            <ul className="mt-4 space-y-3 text-sm text-[#eaf2f0]">
+              <li>Popular routes</li>
+              <li>Seasonal trips</li>
+              <li>Booking tools</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-extrabold uppercase tracking-[0.18em] text-[#a1c7b8]">Support</h4>
+            <ul className="mt-4 space-y-3 text-sm text-[#eaf2f0]">
+              <li>Travel safety</li>
+              <li>Tourist helpline</li>
+              <li>Trip guidance</li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+
+      <button
+        onClick={() => go('safety')}
+        className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-full bg-[#CC4E31] px-4 py-3 text-sm font-bold text-white shadow-[0_18px_42px_rgba(204,78,49,0.35)] hover:scale-[1.02]"
+      >
+        <ShieldCheck size={16} /> SOS
+      </button>
+
+      {toast && (
+        <div className="fixed left-1/2 top-5 z-50 -translate-x-1/2 rounded-full bg-[#0B3D2E] px-4 py-2 text-sm font-semibold text-white shadow-xl">
+          {toast}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function HomePage({
+  go,
+  toggleFavorite,
+  favorites,
+}: {
+  go: (page: Page, destination?: Destination) => void
+  toggleFavorite: (name: string) => void
+  favorites: string[]
+}) {
+  return (
+    <>
+      <section className="hero-pattern">
+        <div className="mx-auto max-w-7xl px-4 py-12 md:py-20 lg:px-8">
+          <div className="max-w-2xl text-white">
+            <span className="mb-5 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[#dfeee7]">
+              Travel with confidence
+            </span>
+            <h1 className="text-4xl font-black leading-[1.05] tracking-[-0.06em] md:text-6xl">
+              Discover the real <span className="text-[#d5f8ea]">Bangladesh.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-8 text-white/80 md:text-lg">
+              Explore, plan, book and travel with confidence across beaches, hills, heritage and nature.
+            </p>
+
+            <div className="mt-8 rounded-[26px] border border-white/10 bg-white/10 p-3 backdrop-blur-md">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                <div className="flex flex-1 items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-[#12372d]">
+                  <MapPin size={18} className="text-[#0B3D2E]" />
+                  <input
+                    defaultValue="Where do you want to go?"
+                    className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-[#5d7b6f]"
+                  />
+                </div>
+                <button onClick={() => go('explore')} className="rounded-2xl bg-[#0B3D2E] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#0B3D2E]/20">
+                  Explore
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center gap-3 text-sm text-white/80">
+              <Check size={16} className="text-[#b8f3d4]" /> Verified local tips & AI-powered planning
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+        <div className="mb-6 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">Take your pick</p>
+            <h2 className="mt-2 text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">What are you in the mood for?</h2>
+          </div>
+          <button onClick={() => go('explore')} className="hidden rounded-full border border-[#d5e4dc] bg-white px-4 py-2 text-sm font-semibold text-[#12372d] md:inline-flex">
+            View all <ArrowRight size={16} className="ml-2" />
+          </button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {categories.map((category) => {
+            const Icon = category.icon
+            return (
+              <button
+                key={category.name}
+                onClick={() => go('explore')}
+                className="rounded-[26px] border border-[#dfeae3] bg-white p-5 text-left shadow-sm hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#edf6f0] text-[#0B3D2E]">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div className="mt-6 text-2xl font-bold text-[#12372d]">{category.name}</div>
+                <div className="mt-1 text-sm text-[#5f786f]">Explore wonders</div>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+
+      <section className="bg-[#eef5f1] py-12">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="mb-6 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">Handpicked for you</p>
+              <h2 className="mt-2 text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Popular right now</h2>
+            </div>
+            <button onClick={() => go('explore')} className="hidden rounded-full border border-[#dfeae3] bg-white px-4 py-2 text-sm font-semibold text-[#12372d] md:inline-flex">
+              See all <ArrowRight size={16} className="ml-2" />
+            </button>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-4">
+            {featured.map((destination) => {
+              const isFavorite = favorites.includes(destination.name)
+              return (
+                <article key={destination.name} className="overflow-hidden rounded-[28px] bg-white shadow-sm ring-1 ring-[#e2ece7] transition hover:-translate-y-1 hover:shadow-lg">
+                  <div className="relative">
+                    <img src={destination.image} alt={destination.name} className="h-64 w-full object-cover" />
+                    <button
+                      onClick={() => toggleFavorite(destination.name)}
+                      className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-[#12372d] shadow-sm"
+                    >
+                      <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                  <div className="p-5">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="rounded-full bg-[#edf6f0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#0B3D2E]">
+                        {destination.category}
+                      </span>
+                      <div className="flex items-center gap-1 text-sm font-bold text-[#12372d]">
+                        <Star size={14} className="fill-[#f2b84b] text-[#f2b84b]" /> {destination.rating}
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-extrabold tracking-[-0.04em] text-[#12372d]">{destination.name}</h3>
+                    <div className="mt-2 flex items-center gap-2 text-sm text-[#597367]">
+                      <MapPin size={14} /> {destination.location}
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-[#4d685f]">{destination.description.slice(0, 100)}...</p>
+                    <div className="mt-5 flex items-center justify-between">
+                      <div>
+                        <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">From</div>
+                        <div className="text-xl font-extrabold text-[#12372d]">{destination.price}</div>
+                      </div>
+                      <button onClick={() => go('details', destination)} className="rounded-full bg-[#0B3D2E] px-4 py-2.5 text-sm font-bold text-white">
+                        View details
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
+        <div className="rounded-[30px] bg-[#0B3D2E] p-7 text-white md:p-10">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#dbeee6]">AI trip planner</p>
+              <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] md:text-5xl">Build your next trip in minutes.</h2>
+              <p className="mt-4 max-w-md text-base leading-7 text-[#d9eee7]">
+                Share your destination, travel style and budget, then let our AI generate a smart itinerary for you.
+              </p>
+            </div>
+            <div className="rounded-[26px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+              <div className="mb-4 flex items-center gap-2 text-sm text-white/85">
+                <Sparkles size={16} className="text-[#b8f3d4]" /> Example: “3 days Sajek trip, budget ৳10,000”
+              </div>
+              <button onClick={() => go('planner')} className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-[#0B3D2E]">
+                Try the planner <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-4 px-4 py-10 md:grid-cols-3 lg:px-8">
+        {[{
+          icon: ShieldCheck,
+          title: 'Travel with confidence',
+          desc: 'Safety contacts and smart local guidance when you need it.',
+        }, {
+          icon: Bell,
+          title: 'Stay informed',
+          desc: 'Update on weather, transport, and destination alerts.',
+        }, {
+          icon: MessageCircle,
+          title: 'Plan faster',
+          desc: 'AI tools help you discover routes, places and hotels quickly.',
+        }].map(({ icon: Icon, title, desc }) => (
+          <div key={title} className="rounded-[26px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#edf6f0] text-[#0B3D2E]">
+              <Icon size={20} />
+            </div>
+            <h3 className="mt-5 text-xl font-extrabold text-[#12372d]">{title}</h3>
+            <p className="mt-2 text-sm leading-7 text-[#567167]">{desc}</p>
+          </div>
+        ))}
+      </section>
+    </>
+  )
+}
+
+function ExplorePage({
+  go,
+  toggleFavorite,
+  favorites,
+}: {
+  go: (page: Page, destination?: Destination) => void
+  toggleFavorite: (name: string) => void
+  favorites: string[]
+}) {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('All')
+  const [budget, setBudget] = useState('Any')
+
+  const filtered = destinations.filter((destination) => {
+    const matchesQuery = destination.name.toLowerCase().includes(query.toLowerCase()) || destination.location.toLowerCase().includes(query.toLowerCase())
+    const matchesCategory = category === 'All' || destination.category === category
+    const matchesBudget = budget === 'Any' || destination.price.replace(/[৳,]/g, '').length < 6
+    return matchesQuery && matchesCategory && matchesBudget
+  })
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-5 shadow-sm">
+        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr_0.7fr]">
+          <div className="flex items-center gap-3 rounded-2xl bg-[#f3f8f4] px-4 py-3">
+            <MapPin size={18} className="text-[#0B3D2E]" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search destinations"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-[#637d72]"
+            />
+          </div>
+
+          <select value={category} onChange={(event) => setCategory(event.target.value)} className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-3 py-3 text-sm outline-none">
+            <option>All</option>
+            <option>Beaches</option>
+            <option>Hills</option>
+            <option>Nature</option>
+            <option>Heritage</option>
+          </select>
+
+          <select value={budget} onChange={(event) => setBudget(event.target.value)} className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-3 py-3 text-sm outline-none">
+            <option>Any</option>
+            <option>৳5k-8k</option>
+            <option>৳8k-12k</option>
+            <option>৳12k+</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {filtered.map((destination) => {
+          const isFavorite = favorites.includes(destination.name)
+          return (
+            <article key={destination.name} className="overflow-hidden rounded-[28px] border border-[#dfeae3] bg-white shadow-sm">
+              <div className="relative">
+                <img src={destination.image} alt={destination.name} className="h-56 w-full object-cover" />
+                <button onClick={() => toggleFavorite(destination.name)} className="absolute right-4 top-4 rounded-full bg-white/90 p-2 text-[#12372d]">
+                  <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
+                </button>
+              </div>
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="rounded-full bg-[#edf6f0] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#0B3D2E]">{destination.category}</span>
+                  <div className="flex items-center gap-1 text-sm font-bold text-[#12372d]">
+                    <Star size={14} className="fill-[#f2b84b] text-[#f2b84b]" /> {destination.rating}
+                  </div>
+                </div>
+                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.04em] text-[#12372d]">{destination.name}</h3>
+                <div className="mt-2 flex items-center gap-2 text-sm text-[#587169]">
+                  <MapPin size={14} /> {destination.location}
+                </div>
+                <p className="mt-3 text-sm leading-6 text-[#4c685f]">{destination.description}</p>
+                <div className="mt-5 flex items-center justify-between">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">From</div>
+                    <div className="text-xl font-extrabold text-[#12372d]">{destination.price}</div>
+                  </div>
+                  <button onClick={() => go('details', destination)} className="rounded-full bg-[#0B3D2E] px-4 py-2.5 text-sm font-bold text-white">
+                    Explore
+                  </button>
+                </div>
+              </div>
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+function PlannerPage({ notify }: { notify: (message: string) => void }) {
+  const [loading, setLoading] = useState(false)
+  const [trip, setTrip] = useState('3 days Sajek trip, budget ৳10,000')
+  const [result, setResult] = useState<any>(null)
+
+  const generatePlan = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setResult({
+        title: '3 days in Sajek Valley',
+        budget: '৳10,400',
+        transport: 'Dhaka to Khagrachhari bus + local jeep',
+        hotel: 'Hillview Cottage, Sajek',
+        plan: [
+          { day: 'Day 1', items: ['Arrive in Sajek', 'Sunset point visit', 'Local cultural evening'] },
+          { day: 'Day 2', items: ['Konglak Hill sunrise', 'Fisherman village lunch', 'Bamboo hotel evening'] },
+          { day: 'Day 3', items: ['Tea break and scenic viewpoints', 'Return journey', 'Souvenir shopping'] },
+        ],
+      })
+      setLoading(false)
+      notify('AI trip plan generated successfully')
+    }, 1400)
+  }
+
+  return (
+    <section className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">AI Trip Planner</div>
+        <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Plan your next destination</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <input value={trip} onChange={(event) => setTrip(event.target.value)} className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-4 py-3 text-sm outline-none" />
+          <button onClick={generatePlan} className="rounded-2xl bg-[#0B3D2E] px-4 py-3 text-sm font-bold text-white">
+            {loading ? 'Planning...' : 'Generate itinerary'}
+          </button>
+        </div>
+
+        {loading && (
+          <div className="mt-6 rounded-[24px] bg-[#edf6f0] p-5">
+            <div className="flex items-center gap-3">
+              <span className="h-3 w-3 animate-pulse rounded-full bg-[#0B3D2E]" />
+              <span className="text-sm font-semibold text-[#12372d]">AI is crafting an itinerary...</span>
+            </div>
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-[#dfeae4]">
+              <div className="h-full w-2/3 animate-pulse rounded-full bg-[#0B3D2E]" />
+            </div>
+          </div>
+        )}
+
+        {result && (
+          <div className="mt-6 rounded-[28px] bg-[#f5faf6] p-5 ring-1 ring-[#dfeae4]">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-sm font-bold uppercase tracking-[0.18em] text-[#768c82]">Itinerary</div>
+                <h3 className="mt-2 text-2xl font-black text-[#12372d]">{result.title}</h3>
+              </div>
+              <div className="rounded-full bg-[#0B3D2E] px-3 py-2 text-sm font-bold text-white">Estimated budget: {result.budget}</div>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Transport</div>
+                <div className="mt-2 text-sm font-bold text-[#12372d]">{result.transport}</div>
+              </div>
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Hotel</div>
+                <div className="mt-2 text-sm font-bold text-[#12372d]">{result.hotel}</div>
+              </div>
+              <div className="rounded-2xl bg-white p-4 shadow-sm">
+                <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Best time</div>
+                <div className="mt-2 text-sm font-bold text-[#12372d]">Oct - Mar</div>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {result.plan.map((item: any) => (
+                <div key={item.day} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#dfeae4]">
+                  <div className="text-lg font-extrabold text-[#12372d]">{item.day}</div>
+                  <ul className="mt-3 space-y-2 text-sm text-[#4d685f]">
+                    {item.items.map((line: string) => (
+                      <li key={line} className="flex gap-2"><Check size={16} className="mt-0.5 shrink-0 text-[#0B3D2E]" /> {line}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function GuidePage({ notify }: { notify: (message: string) => void }) {
+  const [image, setImage] = useState('https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80')
+  const [selected, setSelected] = useState(true)
+
+  return (
+    <section className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+          <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">AI Visual Guide</div>
+          <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d]">Upload a landmark</h2>
+          <div className="mt-5 rounded-[24px] border border-dashed border-[#cfe0d7] bg-[#f5faf6] p-5 text-center">
+            <Camera size={30} className="mx-auto text-[#0B3D2E]" />
+            <div className="mt-3 text-sm font-semibold text-[#12372d]">Upload or choose a landmark image</div>
+            <input type="file" className="mt-4 block w-full text-sm text-[#465e54]" onChange={() => setSelected(true)} />
+          </div>
+          <button onClick={() => { setSelected(true); notify('Visual recognition complete') }} className="mt-5 rounded-2xl bg-[#0B3D2E] px-4 py-3 text-sm font-bold text-white">
+            Identify landmark
+          </button>
+        </div>
+
+        <div className="rounded-[30px] border border-[#dfeae3] bg-white p-5 shadow-sm">
+          <img src={image} alt="Somapura Mahavihara" className="h-64 w-full rounded-[24px] object-cover" />
+          {selected && (
+            <div className="mt-5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-black text-[#12372d]">Somapura Mahavihara</h3>
+                <button className="rounded-full bg-[#edf6f0] p-2 text-[#0B3D2E]"> <Heart size={16} /> </button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold uppercase tracking-[0.12em]">
+                <span className="rounded-full bg-[#edf6f0] px-2.5 py-1 text-[#0B3D2E]">Historical Site</span>
+                <span className="rounded-full bg-[#edf6f0] px-2.5 py-1 text-[#0B3D2E]">Paharpur, Naogaon</span>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-[#4d685f]">
+                Somapura Mahavihara is one of the largest Buddhist monasteries in South Asia and one of Bangladesh’s most treasured heritage sites. It reflects a remarkable chapter in the region’s intellectual and religious history.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button className="inline-flex items-center gap-2 rounded-full bg-[#0B3D2E] px-4 py-2.5 text-sm font-bold text-white"><Mic size={15} /> Listen</button>
+                <button className="inline-flex items-center gap-2 rounded-full border border-[#dfeae3] px-4 py-2.5 text-sm font-bold text-[#12372d]"><MapPin size={15} /> Show on map</button>
+                <button className="inline-flex items-center gap-2 rounded-full border border-[#dfeae3] px-4 py-2.5 text-sm font-bold text-[#12372d]"><Check size={15} /> Save</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TranslatorPage() {
+  const [text, setText] = useState('Where is the nearest tea garden?')
+  const [lang, setLang] = useState<'bn' | 'en'>('en')
+  const [output, setOutput] = useState('চা বাগানটি কোথায়?')
+
+  const translate = () => {
+    setOutput(lang === 'en' ? 'চা বাগানটি কোথায়?' : 'Where is the nearest tea garden?')
+  }
+
+  return (
+    <section className="mx-auto max-w-4xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">AI Translator</div>
+        <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Bengali ↔ English</h2>
+
+        <div className="mt-6 flex items-center gap-3 rounded-2xl bg-[#f3f8f4] p-2">
+          <button onClick={() => setLang('bn')} className={`rounded-full px-4 py-2 text-sm font-bold ${lang === 'bn' ? 'bg-[#0B3D2E] text-white' : 'text-[#12372d]'}`}>
+            BN → EN
+          </button>
+          <button onClick={() => setLang('en')} className={`rounded-full px-4 py-2 text-sm font-bold ${lang === 'en' ? 'bg-[#0B3D2E] text-white' : 'text-[#12372d]'}`}>
+            EN → BN
+          </button>
+          <button className="ml-auto rounded-full bg-white p-2.5 text-[#0B3D2E] shadow-sm ring-1 ring-[#dfeae3]">
+            <Mic size={16} />
+          </button>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <textarea value={text} onChange={(event) => setText(event.target.value)} className="min-h-[120px] rounded-[24px] border border-[#dfeae3] bg-[#f9fbfa] p-4 text-sm leading-7 outline-none" />
+          <div className="rounded-[24px] border border-[#dfeae3] bg-[#f9fbfa] p-4 text-sm leading-7 text-[#12372d]">{output}</div>
+        </div>
+
+        <button onClick={translate} className="mt-5 rounded-2xl bg-[#0B3D2E] px-5 py-3 text-sm font-bold text-white">Translate</button>
+
+        <div className="mt-8 rounded-[24px] bg-[#f5faf6] p-4">
+          <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-[#768c82]">Conversation</div>
+          <div className="space-y-3 text-sm">
+            <div className="ml-auto max-w-[80%] rounded-2xl bg-[#0B3D2E] px-4 py-3 text-white">Where can I find a tea garden nearby?</div>
+            <div className="max-w-[80%] rounded-2xl bg-white px-4 py-3 text-[#12372d] ring-1 ring-[#dfeae3]">আপনি সিলেটের কাছাকাছি চা বাগান খুঁজে পেতে পারেন।</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function BookingPage({ notify }: { notify: (message: string) => void }) {
+  const [mode, setMode] = useState<'Transport' | 'Stay'>('Stay')
+  const [selectedOption, setSelectedOption] = useState<number | null>(1)
+  const options = [
+    { name: 'Greenline Executive', price: '৳1,750', time: '8:00 AM', type: 'AC bus' },
+    { name: 'Sundarban Coastal Stay', price: '৳4,800', time: '2 nights', type: 'Resort' },
+    { name: 'Jungle View Resort', price: '৳6,200', time: '3 nights', type: 'Eco lodge' },
+  ]
+
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">Book your trip</div>
+        <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Transport & stay booking</h2>
+
+        <div className="mt-6 flex gap-3 rounded-2xl bg-[#f3f8f4] p-2">
+          {['Transport', 'Stay'].map((item) => (
+            <button key={item} onClick={() => setMode(item as 'Transport' | 'Stay')} className={`rounded-full px-4 py-2 text-sm font-bold ${mode === item ? 'bg-[#0B3D2E] text-white' : 'text-[#12372d]'}`}>
+              {item}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <input className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-4 py-3 text-sm outline-none" placeholder="From" />
+          <input className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-4 py-3 text-sm outline-none" placeholder="To" />
+          <input className="rounded-2xl border border-[#dfeae3] bg-[#f9fbfa] px-4 py-3 text-sm outline-none" placeholder="Date" type="date" />
+          <button className="rounded-2xl bg-[#0B3D2E] px-4 py-3 text-sm font-bold text-white">Search</button>
+        </div>
+
+        <div className="mt-8 space-y-4">
+          {options.map((option, idx) => (
+            <div key={option.name} className={`flex flex-col gap-4 rounded-[24px] border p-4 md:flex-row md:items-center md:justify-between ${selectedOption === idx ? 'border-[#0B3D2E] bg-[#eef6f1]' : 'border-[#dfeae3] bg-white'}`}>
+              <div>
+                <div className="text-lg font-extrabold text-[#12372d]">{option.name}</div>
+                <div className="mt-1 text-sm text-[#597367]">{option.type} • {option.time}</div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-xl font-extrabold text-[#12372d]">{option.price}</div>
+                <button onClick={() => setSelectedOption(idx)} className="rounded-full bg-[#0B3D2E] px-4 py-2.5 text-sm font-bold text-white">
+                  {selectedOption === idx ? 'Selected' : 'Select'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={() => notify('Booking confirmed successfully')} className="mt-6 rounded-2xl bg-[#CC4E31] px-5 py-3 text-sm font-bold text-white">Confirm booking</button>
+      </div>
+    </section>
+  )
+}
+
+function TripPage({ go }: { go: (page: Page, destination?: Destination) => void }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">My trip</div>
+        <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Upcoming journey</h2>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-[26px] bg-[#f5faf6] p-5 ring-1 ring-[#dfeae3]">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Destination</div>
+                <div className="mt-2 text-2xl font-black text-[#12372d]">Sajek Valley</div>
+              </div>
+              <div className="rounded-full bg-[#0B3D2E] px-3 py-1.5 text-sm font-bold text-white">4 days</div>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl bg-white p-4"><div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Hotel</div><div className="mt-2 text-sm font-bold text-[#12372d]">Hillview Cottage</div></div>
+              <div className="rounded-2xl bg-white p-4"><div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Transport</div><div className="mt-2 text-sm font-bold text-[#12372d]">Dhaka → Khagrachhari</div></div>
+            </div>
+
+            <div className="mt-6 space-y-3 text-sm text-[#4d685f]">
+              {['Day 1: Scenic road trip', 'Day 2: Sunset point and local culture', 'Day 3: Village walk and tea break', 'Day 4: Return journey'].map((item) => (
+                <div key={item} className="flex gap-2"><Check size={15} className="mt-0.5 shrink-0 text-[#0B3D2E]" /> {item}</div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[26px] bg-white p-5 ring-1 ring-[#dfeae3]">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Budget</div>
+            <div className="mt-2 text-3xl font-extrabold text-[#12372d]">৳10,400</div>
+            <div className="mt-4 space-y-3 text-sm text-[#4d685f]">
+              <div className="flex justify-between"><span>Hotel</span><span>৳4,000</span></div>
+              <div className="flex justify-between"><span>Transport</span><span>৳3,200</span></div>
+              <div className="flex justify-between"><span>Food</span><span>৳2,500</span></div>
+              <div className="flex justify-between"><span>Activities</span><span>৳700</span></div>
+            </div>
+            <button onClick={() => go('booking')} className="mt-6 w-full rounded-2xl bg-[#CC4E31] px-4 py-3 text-sm font-bold text-white">Manage booking</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ProfilePage({ favorites, go }: { favorites: string[]; go: (page: Page, destination?: Destination) => void }) {
+  return (
+    <section className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0B3D2E] text-xl font-black text-white">R</div>
+          <div>
+            <div className="text-2xl font-black text-[#12372d]">Raihan</div>
+            <div className="text-sm text-[#597367]">Traveller profile</div>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-[24px] bg-[#f5faf6] p-5 ring-1 ring-[#dfeae3]">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Saved destinations</div>
+            <div className="mt-4 space-y-3">
+              {favorites.map((item) => (
+                <button key={item} onClick={() => go('explore')} className="flex w-full items-center justify-between rounded-2xl bg-white p-3 text-left text-sm font-semibold text-[#12372d] shadow-sm">
+                  <span>{item}</span>
+                  <ArrowRight size={15} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[24px] bg-[#f5faf6] p-5 ring-1 ring-[#dfeae3]">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-[#7f8f89]">Booking history</div>
+            <div className="mt-4 space-y-3 text-sm text-[#4d685f]">
+              <div className="rounded-2xl bg-white p-3">Cox’s Bazar • 2 nights</div>
+              <div className="rounded-2xl bg-white p-3">Srimangal • 3 nights</div>
+              <div className="rounded-2xl bg-white p-3">Rangamati • 2 nights</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function SafetyPage({ notify }: { notify: (message: string) => void }) {
+  const [confirmed, setConfirmed] = useState(false)
+  const actions = [
+    { title: '999 Emergency Call', detail: 'National emergency hotline', icon: Activity },
+    { title: 'Tourist Police', detail: '+880 1xxx-xxxx', icon: ShieldCheck },
+    { title: 'Share Location', detail: 'Send current location to family', icon: LocateFixed },
+    { title: 'Nearby Hospital', detail: 'Nearest medical assistance', icon: BarChart3 },
+    { title: 'Nearby Police Station', detail: 'Find local help', icon: Bell },
+  ]
+
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-10 lg:px-8">
+      <div className="rounded-[30px] border border-[#dfeae3] bg-white p-6 shadow-sm">
+        <div className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-[#CC4E31]">Safety & SOS</div>
+        <h2 className="text-3xl font-black tracking-[-0.06em] text-[#12372d] md:text-5xl">Travel with confidence</h2>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {actions.map(({ title, detail, icon: Icon }) => (
+            <div key={title} className="rounded-[24px] bg-[#f5faf6] p-5 ring-1 ring-[#dfeae3]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0B3D2E] text-white">
+                <Icon size={20} />
+              </div>
+              <div className="mt-4 text-lg font-extrabold text-[#12372d]">{title}</div>
+              <div className="mt-2 text-sm text-[#597367]">{detail}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 rounded-[28px] bg-[#fff2ee] p-5 ring-1 ring-[#f6d4c7]">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.16em] text-[#c9674d]">Emergency</div>
+              <div className="mt-2 text-2xl font-black text-[#12372d]">Need urgent help?</div>
+            </div>
+            <button
+              onClick={() => setConfirmed((value) => !value)}
+              className="rounded-full bg-[#CC4E31] px-4 py-2.5 text-sm font-bold text-white"
+            >
+              {confirmed ? 'SOS enabled' : 'Trigger SOS'}
+            </button>
+          </div>
+
+          {confirmed && (
+            <div className="mt-4 rounded-2xl bg-white p-4 text-sm text-[#4d685f] ring-1 ring-[#f1d8d1]">
+              SOS action confirmed. Emergency services, your location and emergency contacts have been prepared.
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export default App
