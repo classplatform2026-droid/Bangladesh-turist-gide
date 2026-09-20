@@ -1,3 +1,3 @@
-# Admin
+# DeshGo admin
 
-This folder is for the admin panel or dashboard.
+Reserved for the admin dashboard: destination management, bookings, safety content and media moderation.
